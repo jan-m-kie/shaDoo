@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "clean": "rimraf .next"
+    "clean": "rimraf .next",
+    "create-pr": "./scripts/create-pr.sh"
   },
   "dependencies": {
     "next": "^14.2.0",
