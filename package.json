@@ -7,6 +7,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "clean": "rimraf .next",
+    "create-pr": "./scripts/create-pr.sh"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "lru-cache": "^10.4.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.8.0",
+    "eslint-config-next": "^14.2.0",
+    "@eslint/config-array": "^0.17.0",
+    "@eslint/config-inspector": "^0.5.0",
+    "rimraf": "^6.0.0",
+    "glob": "^11.0.0"
     "lint": "next lint"
   },
   "dependencies": {
