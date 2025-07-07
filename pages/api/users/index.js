@@ -1,4 +1,4 @@
-import { supabase, handleDatabaseError, handleResponse } from '../../../lib/supabase'
+import { supabase, cachedSupabase, handleDatabaseError, handleResponse } from '../../../lib/supabase.js'
 
 export default async function handler(req, res) {
   // Handle CORS preflight request
@@ -25,18 +25,19 @@ export default async function handler(req, res) {
 }
 
 async function getUsers(req, res) {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .order('created_at', { ascending: false })
+  try {
+    // Use cached supabase for GET operations to benefit from request coalescing
+    const data = await cachedSupabase.select('users', {
+      select: '*',
+      order: { column: 'created_at', ascending: false }
+    })
 
-  if (error) {
+    const response = handleResponse(data)
+    res.status(200).json(response)
+  } catch (error) {
     const errorResponse = handleDatabaseError(error)
-    return res.status(500).json(errorResponse)
+    res.status(500).json(errorResponse)
   }
-
-  const response = handleResponse(data)
-  res.status(200).json(response)
 }
 
 async function createUser(req, res) {
@@ -49,17 +50,19 @@ async function createUser(req, res) {
     })
   }
 
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{ username, email }])
-    .select()
-    .single()
+  try {
+    // Use cached supabase for write operations (automatically invalidates cache)
+    const { data, error } = await cachedSupabase.insert('users', [{ username, email }])
 
-  if (error) {
+    if (error) {
+      const errorResponse = handleDatabaseError(error)
+      return res.status(400).json(errorResponse)
+    }
+
+    const response = handleResponse(data[0])
+    res.status(201).json(response)
+  } catch (error) {
     const errorResponse = handleDatabaseError(error)
-    return res.status(400).json(errorResponse)
+    res.status(400).json(errorResponse)
   }
-
-  const response = handleResponse(data)
-  res.status(201).json(response)
 }
